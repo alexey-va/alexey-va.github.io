@@ -55,7 +55,7 @@ export class Calc extends Component {
 
     fetchResult = (exp) => {
         let expression = exp.join("")
-        let value = `http://localhost:8080/make?expression=${encodeURIComponent(`${expression}`)
+        let value = `http://178.44.115.21:25900/make?expression=${encodeURIComponent(`${expression}`)
             .replace('%20', '+')}`
         console.log(value)
         console.log(expression)
