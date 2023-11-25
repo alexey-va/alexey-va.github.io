@@ -122,7 +122,7 @@ export class Calc extends Component {
         </>
     }
 
-    opButtonDot = (props) => {
+    opButtonDot = (props ) => {
         return <>
             <button className="text-[1.5rem] hover:opacity-100 transition-all duration-150 ease-in-out bg-[#656565] opacity-90
              border-r border-b border-[#333333] aspect-[1/0.9] "
