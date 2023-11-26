@@ -55,13 +55,18 @@ export class Calc extends Component {
 
     fetchResult = (exp) => {
         let expression = exp.join("")
-        let value = `http://178.44.115.21:25900/make?expression=${encodeURIComponent(`${expression}`)
+        let value = `http://localhost:25900/make?expression=${encodeURIComponent(`${expression}`)
             .replace('%20', '+')}`
         console.log(value)
         console.log(expression)
         fetch(value)
             .then((res) =>
-                res.text().then((data) => this.setRes(data)))
+                res.text().then((data) => {
+                    if(data === undefined || data === null || data.length > 20 || data === "не число"){
+                        this.setRes("Ошибка!")
+                    }
+                    this.setRes(data)
+        }))
     }
 
     changeExp = (id) => {
@@ -75,9 +80,9 @@ export class Calc extends Component {
             case "=":
                 if(this.state.ch){
                     this.fetchResult(this.state.exp);
-                    if(!this.state.exp.includes("rand()")) this.setChange(false)
+                    if(!this.state.exp.includes("rand()") && !this.state.exp.includes("Ошибка!")) this.setChange(false)
                 } else{
-                    this.setExp(this.state.result)
+                    if(!this.state.exp.includes("Ошибка!")) this.setExp(this.state.result)
                 }
                 break;
             case "del":
@@ -156,6 +161,25 @@ export class Calc extends Component {
         </>
     }
 
+    formatNumber = (number) => {
+        const value = number + '';
+        const list = value.split('.');
+        const prefix = list[0].charAt(0) === '-' ? '-' : '';
+        let num = prefix ? list[0].slice(1) : list[0];
+        let result = '';
+        while (num.length > 3 && !num.includes("E")) {
+            result = ` ${num.slice(-3)}${result}`;
+            num = num.slice(0, num.length - 3);
+        }
+        if (num) {
+            result = num + result;
+        }
+        if(result.length > 16){
+            result = result.substring(0, 16).trim()+"..."
+        }
+        return `${prefix}${result}${list[1] ? `.${list[1]}` : ''}`;
+    };
+
     render() {
         return <>
             <div className="bg-[#1E1F22] w-full h-screen flex justify-center items-center">
@@ -167,10 +191,9 @@ export class Calc extends Component {
                             <div className="opacity-0">a</div>
                             {this.state.exp} <div className="pl-1">{this.state.exp?.length > 0 ? "= " : ""}</div>
                         </div>
-                        <div className="flex justify-between items-end w-full -my-3">
+                        <div className="flex justify-between items-end w-full -my-3 overflow-hidden pr-4">
                             <div className="max-sm:opacity-0 text-xl px-6 pb-4 opacity-70">{this.state.rad}</div>
-                            <div className="opacity-0 text-[3rem] px-5">a</div>
-                            <div className="text-[3rem] px-5">{this.state.result}</div>
+                            <div className="text-[3rem] px-5 overflow-hidden whitespace-nowrap">{this.formatNumber(this.state.result)}</div>
                         </div>
                     </div>
 
