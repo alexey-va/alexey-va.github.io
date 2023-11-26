@@ -55,19 +55,25 @@ export class Calc extends Component {
 
     fetchResult = (exp) => {
         let expression = exp.join("")
-        let value = `http://localhost:25900/make?expression=${encodeURIComponent(`${expression}`)
+        let request = `http://localhost:25900/make?expression=${encodeURIComponent(`${expression}`)
             .replace('%20', '+')}`
-        console.log(value)
-        console.log(expression)
-        fetch(value)
-            .then((res) =>
-                res.text().then((data) => {
-                    if(data === undefined || data === null || data.length > 20 || data === "не число"){
-                        this.setRes("Ошибка!")
-                    }
-                    this.setRes(data)
-        }))
+        fetch(request).then(
+            (response) => {
+                console.log(response)
+                if(response.ok){
+                    response.text().then((data) => {
+                        if(data === undefined || data === null || data.length > 20 || data === "не число"){
+                            this.setRes("Ошибка!")
+                        }
+                        this.setRes(data)
+                    })
+                } else{
+                    this.setRes("Ошибка!")
+                }
+            }
+        )
     }
+
 
     changeExp = (id) => {
         if(id !== "") this.setChange(true)
@@ -100,7 +106,7 @@ export class Calc extends Component {
         return <>
             <button className="hover:opacity-100 transition-all duration-150 ease-in-out
              bg-[#474747] opacity-90 border-r border-b border-[#333333] aspect-[1/0.9]"
-                onClick={() => this.changeExp(props.id)}
+                    onClick={() => this.changeExp(props.id)}
             >
                 {props.name}
             </button>
@@ -167,7 +173,7 @@ export class Calc extends Component {
         const prefix = list[0].charAt(0) === '-' ? '-' : '';
         let num = prefix ? list[0].slice(1) : list[0];
         let result = '';
-        while (num.length > 3 && !num.includes("E")) {
+        while (num.length > 3 && !num.includes("E") && !this.state.result.includes("Ошибка!")) {
             result = ` ${num.slice(-3)}${result}`;
             num = num.slice(0, num.length - 3);
         }
